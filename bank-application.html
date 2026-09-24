@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Open an Account — Meridian Bank</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0e2438;
+    --navy-dark:#081729;
+    --ink:#1c232b;
+    --paper:#f5f6f8;
+    --panel:#ffffff;
+    --teal:#0f8b8d;
+    --slate:#5c6b7a;
+    --line:#dfe3e8;
+    --error:#b3261e;
+    --radius:6px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Inter',sans-serif;background:var(--paper);color:var(--ink);line-height:1.6;}
+  h1,h2,h3{font-family:'Merriweather',serif;margin:0 0 .5rem 0;color:var(--navy-dark);}
+  a{color:inherit;text-decoration:none;}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 1.5rem;}
+
+  /* ---- navbar (shared) ---- */
+  header.site-nav{background:var(--navy);color:#fff;position:sticky;top:0;z-index:50;border-bottom:3px solid var(--teal);}
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;padding:.9rem 1.5rem;max-width:1120px;margin:0 auto;}
+  .brand{font-family:'Merriweather',serif;font-weight:700;font-size:1.25rem;color:#fff;}
+  .brand span{color:var(--teal);}
+  nav.links{display:flex;gap:2rem;align-items:center;}
+  nav.links a{font-size:.95rem;color:#e7ecf1;opacity:.9;padding:.3rem 0;border-bottom:2px solid transparent;}
+  nav.links a:hover{opacity:1;border-bottom-color:var(--teal);}
+  nav.links a.cta-link{background:var(--teal);color:#fff;padding:.5rem 1.1rem;border-radius:var(--radius);font-weight:600;opacity:1;}
+  .hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:.4rem;}
+  .hamburger span{width:26px;height:2px;background:#fff;display:block;}
+  @media (max-width:780px){
+    .hamburger{display:flex;}
+    nav.links{
+      position:absolute;top:100%;left:0;right:0;background:var(--navy);
+      flex-direction:column;align-items:flex-start;gap:0;max-height:0;overflow:hidden;
+      transition:max-height .25s ease;border-bottom:3px solid var(--teal);
+    }
+    nav.links.open{max-height:320px;}
+    nav.links a{width:100%;padding:.9rem 1.5rem;border-bottom:1px solid rgba(255,255,255,.08);}
+    nav.links a.cta-link{border-radius:0;margin:.5rem 1.5rem;text-align:center;width:calc(100% - 3rem);}
+  }
+
+  /* ---- page header ---- */
+  .page-head{background:var(--navy-dark);color:#fff;padding:3rem 0;}
+  .page-head p{color:#c6cfd8;max-width:520px;margin-top:.5rem;}
+
+  /* ---- form section ---- */
+  .form-section{padding:3rem 0 4.5rem;}
+  form{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:2rem;max-width:720px;}
+  fieldset{border:none;padding:0;margin:0 0 1.8rem 0;}
+  legend{font-family:'Merriweather',serif;font-weight:700;font-size:1.1rem;color:var(--navy-dark);margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid var(--line);width:100%;}
+  .field{margin-bottom:1.2rem;}
+  .field label{display:block;font-weight:600;font-size:.92rem;margin-bottom:.35rem;}
+  .req{color:var(--error);}
+  .field input[type=text],
+  .field input[type=email],
+  .field input[type=password],
+  .field input[type=tel],
+  .field input[type=date],
+  .field input[type=number],
+  .field select,
+  .field textarea,
+  .field input[type=file]{
+    width:100%;
+    padding:.65rem .8rem;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    background:#fff;
+    font-family:'Inter',sans-serif;
+    font-size:.95rem;
+    color:var(--ink);
+  }
+  .field input:focus,
+  .field select:focus,
+  .field textarea:focus{outline:2px solid var(--teal);outline-offset:1px;border-color:var(--teal);}
+  .field textarea{resize:vertical;min-height:90px;}
+  .hint{font-size:.8rem;color:var(--slate);margin-top:.3rem;}
+  .error-msg{display:none;font-size:.82rem;color:var(--error);margin-top:.35rem;font-weight:600;}
+  .field.invalid input,
+  .field.invalid select,
+  .field.invalid textarea{border-color:var(--error);}
+  .field.invalid .error-msg{display:block;}
+
+  .radio-group, .checkbox-row{display:flex;gap:1.5rem;flex-wrap:wrap;align-items:center;}
+  .radio-group label, .checkbox-row label{font-weight:400;display:flex;align-items:center;gap:.4rem;margin-bottom:0;}
+  .checkbox-row{margin-top:.2rem;}
+
+  .form-actions{display:flex;gap:1rem;margin-top:1.6rem;flex-wrap:wrap;}
+  .btn{padding:.8rem 1.7rem;border-radius:var(--radius);font-weight:600;font-size:.95rem;cursor:pointer;border:2px solid transparent;}
+  .btn-primary{background:var(--teal);color:#fff;}
+  .btn-primary:hover{filter:brightness(1.08);}
+  .btn-outline{background:transparent;border-color:var(--navy);color:var(--navy-dark);}
+  .btn-outline:hover{background:rgba(14,36,56,.06);}
+
+  /* ---- success summary ---- */
+  .success-box{display:none;max-width:720px;background:#e7f4f0;border:1px solid #9fcdc0;border-radius:var(--radius);padding:1.6rem;margin-bottom:2rem;}
+  .success-box h2{color:#0b6a6c;font-size:1.2rem;}
+  .success-box dl{display:grid;grid-template-columns:200px 1fr;gap:.4rem 1rem;margin:.8rem 0 0;font-size:.92rem;}
+  .success-box dt{font-weight:600;color:var(--navy-dark);}
+  .success-box dd{margin:0;}
+
+  footer{background:var(--navy-dark);color:#c6cfd8;padding:2rem 0;margin-top:1rem;text-align:center;font-size:.85rem;}
+</style>
+</head>
+<body>
+
+  <!-- ================= NAVBAR ================= -->
+  <header class="site-nav">
+    <div class="nav-inner">
+      <a href="index.html" class="brand">Meridian <span>Bank</span></a>
+      <nav class="links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="index.html#services">Accounts &amp; Loans</a>
+        <a href="index.html#about">About</a>
+        <a href="index.html#contact">Contact</a>
+        <a href="application.html" class="cta-link">Apply Now</a>
+      </nav>
+      <button class="hamburger" id="hamburgerBtn" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <section class="page-head">
+    <div class="wrap">
+      <h1>Open an account</h1>
+      <p>Fill in the form below. Bring your original ID document when you visit a branch to activate your account.</p>
+    </div>
+  </section>
+
+  <section class="form-section">
+    <div class="wrap">
+
+      <!-- Success summary, filled in and shown by JS after valid submit -->
+      <div class="success-box" id="successBox">
+        <h2>Application received</h2>
+        <p>Here's what you submitted. Please bring your original ID to any branch to complete activation.</p>
+        <dl id="summaryList"></dl>
+      </div>
+
+      <form id="applicationForm" novalidate>
+
+        <fieldset>
+          <legend>Personal details</legend>
+
+          <div class="field" id="field-fullname">
+            <label for="fullname">Full name <span class="req">*</span></label>
+            <input type="text" id="fullname" name="fullname" placeholder="e.g. Nusrat Jahan">
+            <div class="error-msg">Please enter your full name.</div>
+          </div>
+
+          <div class="field" id="field-dob">
+            <label for="dob">Date of birth <span class="req">*</span></label>
+            <input type="date" id="dob" name="dob">
+            <div class="hint">You must be at least 18 years old to open an account.</div>
+            <div class="error-msg">Enter a valid date of birth (18+ years).</div>
+          </div>
+
+          <div class="field" id="field-gender">
+            <label>Gender <span class="req">*</span></label>
+            <div class="radio-group">
+              <label><input type="radio" name="gender" value="Female"> Female</label>
+              <label><input type="radio" name="gender" value="Male"> Male</label>
+              <label><input type="radio" name="gender" value="Other"> Other</label>
+            </div>
+            <div class="error-msg">Please select a gender.</div>
+          </div>
+
+          <div class="field" id="field-email">
+            <label for="email">Email address <span class="req">*</span></label>
+            <input type="email" id="email" name="email" placeholder="you@example.com">
+            <div class="error-msg">Please enter a valid email address.</div>
+          </div>
+
+          <div class="field" id="field-phone">
+            <label for="phone">Phone number <span class="req">*</span></label>
+            <input type="tel" id="phone" name="phone" placeholder="01XXXXXXXXX">
+            <div class="hint">11 digits, starting with 0 (e.g. 01712345678).</div>
+            <div class="error-msg">Enter an 11-digit phone number starting with 0.</div>
+          </div>
+
+          <div class="field" id="field-password">
+            <label for="password">Create a login password <span class="req">*</span></label>
+            <input type="password" id="password" name="password" placeholder="At least 8 characters">
+            <div class="hint">Minimum 8 characters, with at least one number.</div>
+            <div class="error-msg">Password must be 8+ characters and include a number.</div>
+          </div>
+
+          <div class="field" id="field-confirmPassword">
+            <label for="confirmPassword">Confirm password <span class="req">*</span></label>
+            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Re-enter your password">
+            <div class="error-msg">Passwords do not match.</div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Account details</legend>
+
+          <div class="field" id="field-accountType">
+            <label for="accountType">Account type <span class="req">*</span></label>
+            <select id="accountType" name="accountType">
+              <option value="">-- Select an account type --</option>
+              <option value="Savings">Savings Account</option>
+              <option value="Current">Current Account</option>
+              <option value="Fixed Deposit">Fixed Deposit</option>
+            </select>
+            <div class="error-msg">Please choose an account type.</div>
+          </div>
+
+          <div class="field" id="field-deposit">
+            <label for="deposit">Initial deposit amount (BDT) <span class="req">*</span></label>
+            <input type="number" id="deposit" name="deposit" min="500" step="1" placeholder="e.g. 5000">
+            <div class="hint">Minimum opening deposit is 500 BDT.</div>
+            <div class="error-msg">Enter an amount of at least 500 BDT.</div>
+          </div>
+
+          <div class="field" id="field-address">
+            <label for="address">Present address <span class="req">*</span></label>
+            <textarea id="address" name="address" placeholder="House, road, area, city"></textarea>
+            <div class="error-msg">Please enter your present address.</div>
+          </div>
+
+          <div class="field" id="field-idFile">
+            <label for="idFile">Upload NID / passport (image) <span class="req">*</span></label>
+            <input type="file" id="idFile" name="idFile" accept="image/*">
+            <div class="error-msg">Please upload an image of your ID document.</div>
+          </div>
+
+          <div class="field" id="field-terms">
+            <div class="checkbox-row">
+              <label><input type="checkbox" id="terms" name="terms"> I agree to the bank's terms &amp; conditions <span class="req">*</span></label>
+            </div>
+            <div class="error-msg">You must agree to the terms &amp; conditions.</div>
+          </div>
+        </fieldset>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Submit application</button>
+          <button type="reset" class="btn btn-outline" id="resetBtn">Reset</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <footer>&copy; 2026 Meridian Bank. Built for a systems design lab assignment.</footer>
+
+<script>
+  // ---- Mobile nav toggle ----
+  const hamburgerBtn = document.getElementById('hamburgerBtn');
+  const navLinks = document.getElementById('navLinks');
+  hamburgerBtn.addEventListener('click', () => {
+    const isOpen = navLinks.classList.toggle('open');
+    hamburgerBtn.setAttribute('aria-expanded', isOpen);
+  });
+
+  // ---- Form validation ----
+  const form = document.getElementById('applicationForm');
+  const successBox = document.getElementById('successBox');
+  const summaryList = document.getElementById('summaryList');
+
+  function setFieldState(fieldId, isValid){
+    const el = document.getElementById(fieldId);
+    el.classList.toggle('invalid', !isValid);
+    return isValid;
+  }
+
+  function calculateAge(dobString){
+    const dob = new Date(dobString + 'T00:00:00');
+    const today = new Date();
+    let age = today.getFullYear() - dob.getFullYear();
+    const monthDiff = today.getMonth() - dob.getMonth();
+    if(monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())){
+      age--;
+    }
+    return age;
+  }
+
+  function validateForm(){
+    let allValid = true;
+
+    // Full name: required
+    const fullname = form.fullname.value.trim();
+    allValid = setFieldState('field-fullname', fullname.length > 0) && allValid;
+
+    // Date of birth: required + must be 18 or older
+    const dobVal = form.dob.value;
+    let dobOk = false;
+    if(dobVal){
+      dobOk = calculateAge(dobVal) >= 18;
+    }
+    allValid = setFieldState('field-dob', dobOk) && allValid;
+
+    // Gender: required radio group
+    allValid = setFieldState('field-gender', !!form.gender.value) && allValid;
+
+    // Email: required + format check
+    const email = form.email.value.trim();
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    allValid = setFieldState('field-email', emailPattern.test(email)) && allValid;
+
+    // Phone: required + pattern rule (11 digits starting with 0)
+    const phone = form.phone.value.trim();
+    const phonePattern = /^0\d{10}$/;
+    allValid = setFieldState('field-phone', phonePattern.test(phone)) && allValid;
+
+    // Password: required + length/strength rule (8+ chars, at least one digit)
+    const password = form.password.value;
+    const passwordPattern = /^(?=.*\d).{8,}$/;
+    allValid = setFieldState('field-password', passwordPattern.test(password)) && allValid;
+
+    // Confirm password: cross-field rule - must match password
+    const confirmPassword = form.confirmPassword.value;
+    allValid = setFieldState('field-confirmPassword', confirmPassword.length > 0 && confirmPassword === password) && allValid;
+
+    // Account type: required
+    allValid = setFieldState('field-accountType', form.accountType.value !== '') && allValid;
+
+    // Deposit: required, minimum 500
+    const depositVal = Number(form.deposit.value);
+    allValid = setFieldState('field-deposit', form.deposit.value !== '' && depositVal >= 500) && allValid;
+
+    // Address: required
+    allValid = setFieldState('field-address', form.address.value.trim().length > 0) && allValid;
+
+    // ID file: required
+    allValid = setFieldState('field-idFile', form.idFile.files.length > 0) && allValid;
+
+    // Terms checkbox: required
+    allValid = setFieldState('field-terms', form.terms.checked) && allValid;
+
+    return allValid;
+  }
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    successBox.style.display = 'none';
+
+    const isValid = validateForm();
+    if(!isValid){
+      const firstInvalid = form.querySelector('.invalid');
+      if(firstInvalid) firstInvalid.scrollIntoView({behavior:'smooth', block:'center'});
+      return;
+    }
+
+    const fileName = form.idFile.files[0] ? form.idFile.files[0].name : '';
+
+    const rows = [
+      ['Name', form.fullname.value.trim()],
+      ['Date of birth', form.dob.value],
+      ['Gender', form.gender.value],
+      ['Email', form.email.value.trim()],
+      ['Phone', form.phone.value.trim()],
+      ['Account type', form.accountType.value],
+      ['Initial deposit', form.deposit.value + ' BDT'],
+      ['Address', form.address.value.trim()],
+      ['ID file', fileName]
+    ];
+
+    summaryList.innerHTML = rows.map(([label, value]) =>
+      `<dt>${label}</dt><dd>${value}</dd>`
+    ).join('');
+
+    successBox.style.display = 'block';
+    successBox.scrollIntoView({behavior:'smooth', block:'start'});
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', function(){
+    form.querySelectorAll('.field.invalid').forEach(f => f.classList.remove('invalid'));
+    successBox.style.display = 'none';
+  });
+</script>
+</body>
+</html>
